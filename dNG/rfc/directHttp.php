@@ -113,7 +113,7 @@ Extend the class using old and new behavior
 		parent::__construct($event_handler);
 
 		if (!defined("USE_socket")) { define("USE_socket", function_exists("fsockopen")); }
-		$this->PHP_curl_init = (defined("USE_curl") ? OW_use_curl : function_exists("curl_init"));
+		$this->PHP_curl_init = (defined("USE_curl") ? USE_curl : function_exists("curl_init"));
 		$this->PHP_stream_select = function_exists("stream_select");
 	}
 /*#ifdef(PHP4):
