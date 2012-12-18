@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+RFC Basics for PHP
+
+(C) direct Netware Group - All rights reserved
+http://www.direct-netware.de/redirect.php?php;rfc_basics
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+v. 2.0. If a copy of the MPL was not distributed with this file, You can
+obtain one at http://mozilla.org/MPL/2.0/.
+
+http://www.direct-netware.de/redirect.php?licenses;mpl2
+// -->
+<project name="rfc_basics.php" default="compile.phpBuilder">
+	<dirname property="src.basedir" file="${ant.file}" />
+	<property file="${src.basedir}/_extras/build.properties" />
+
+	<target name="compile.phpBuilder" description="Compile src.php ${ant.project.name}">
+		<exec executable="python2">
+			<arg file="${phpBuilder.filePathName}" />
+			<arg value="--filetype=${phpBuilder.fileTypes}" />
+			<arg value="--include=${src.basedir}/dNG" />
+			<arg value="--strip_prefix=${src.basedir}/" />
+		</exec>
+	</target>
+</project>
