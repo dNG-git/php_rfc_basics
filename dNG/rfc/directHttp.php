@@ -408,7 +408,7 @@ The behaviour above might change for images in the future.
 
 					}
 
-					if ($is_valid && trim($key) && trim($value))
+					if ($is_valid && strlen(trim($key)))
 					{
 						if ($return) { $return .= "\r\n"; }
 
@@ -421,7 +421,7 @@ The behaviour above might change for images in the future.
 				{
 					if (is_array($value)) { $value = (((isset($value['value']) && isset($value['type']) && $value['type'] != "file") || (!isset($value['type']))) ? $value['value'] : implode("\n", $value)); }
 
-					if (trim($key) && trim($value))
+					if (strlen(trim($key)))
 					{
 						if ($return != "") { $return .= "&"; }
 						$return .= rawurlencode($key)."=".rawurlencode($value);
