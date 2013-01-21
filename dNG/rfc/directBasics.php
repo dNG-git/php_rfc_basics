@@ -523,7 +523,7 @@ Extend the class using old and new behavior
 				}
 			}
 
-			$return = ($rfc2047 ? preg_replace("#(=20)*\?=({$this->linesep} =\?".preg_quote($this->data_encoding)."\?Q\?(=20)+\?=)*$#s", "?=", $return."?=") : rtrim($return));
+			$return = ($rfc2047 ? preg_replace("#(=20)*\?=({$this->linesep} =\?".preg_quote($this->data_encoding, "#")."\?Q\?(=20)+\?=)*$#s", "?=", $return."?=") : rtrim($return));
 		}
 
 		return $return;
