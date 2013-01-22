@@ -60,39 +60,39 @@ class directBasics
 /**
 	* @var string $data_boundary Boundary string for this message
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_boundary = "";
+	protected $data_boundary = "";
 /**
 	* @var string $data_encoding Content encoding
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_encoding = "UTF-8";
+	protected $data_encoding = "UTF-8";
 /**
 	* @var string $data_unique Unique value for each instance
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_unique;
+	protected $data_unique;
 /**
 	* @var object $event_handler The EventHandler is called whenever debug messages
 	*      should be logged or errors happened.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $event_handler;
+	protected $event_handler;
 /**
 	* @var string $linesep Line separator (\r\n or \n)
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $linesep = "\r\n";
+	protected $linesep = "\r\n";
 /**
 	* @var boolean $PHP_mb_encode_mimeheader True if the PHP function
 	*      "mb_encode_mimeheader () " is supported.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_mb_encode_mimeheader;
+	protected $PHP_mb_encode_mimeheader;
 /*#ifndef(PHP5n):
 /**
 	* @var boolean $PHP_quoted_printable_encode True if the PHP function
 	*      "quoted_printable_encode () " is supported.
 *\/
-	/*#ifndef(PHP4) *\/protected/* #*\//*#ifdef(PHP4):var:#*\/ $PHP_quoted_printable_encode;
+	protected $PHP_quoted_printable_encode;
 :#\n*/
 
 /* -------------------------------------------------------------------------
-Extend the class using old and new behavior
+Construct the class
 ------------------------------------------------------------------------- */
 
 /**
@@ -101,7 +101,7 @@ Extend the class using old and new behavior
 	* @param object $event_handler EventHandler to use
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function __construct($event_handler = NULL)
+	public function __construct($event_handler = NULL)
 	{
 		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->__construct(directBasics)- (#echo(__LINE__)#)"); }
 
@@ -112,24 +112,12 @@ Extend the class using old and new behavior
 		$this->PHP_quoted_printable_encode = function_exists("quoted_printable_encode");
 :#\n*/
 	}
-/*#ifdef(PHP4):
-/**
-	* Constructor (PHP4) directBasics
-	*
-	* @param object $event_handler EventHandler to use
-	* @since v0.1.00
-*\/
-	function directBasics($event_handler = NULL) { $this->__construct($event_handler); }
-:#\n*/
 /**
 	* Destructor (PHP5+) __destruct (directBasics)
 	*
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function __destruct()
-	{
-		// Nothing to do for me
-	}
+	public function __destruct() { /* Nothing to do for me */ }
 
 /**
 	* Sets a custom encoding.
@@ -150,7 +138,7 @@ Extend the class using old and new behavior
 	* @return string Aligned header (maximum 76 characters)
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function headerAlign($header)
+	protected function headerAlign($header)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->headerAlign(+header)- (#echo(__LINE__)#)"); }
 
@@ -190,7 +178,7 @@ Extend the class using old and new behavior
 	* @return mixed Array with parsed headers; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function headerParse($headers)
+	public function headerParse($headers)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->headerParse(+headers)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -239,7 +227,7 @@ Extend the class using old and new behavior
 	* @return string Multipart body header
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function multipartBody($name, $data, $alternative_id = "")
+	protected function multipartBody($name, $data, $alternative_id = "")
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->multipartBody($name, +data, $alternative_id)- (#echo(__LINE__)#)"); }
 		$return = (strlen($alternative_id) ? "--=".$alternative_id : "--").$this->data_boundary.$this->linesep;
@@ -254,7 +242,7 @@ Extend the class using old and new behavior
 			if (strlen($name)) { $disposition_fields = (($disposition == "attachment") ? "; filename=\"$name\"" : "; name=\"$name\""); }
 			else { $disposition_fields = ""; }
 
-			if (/*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($data['mimetype'], "text/") === false)
+			if (stripos($data['mimetype'], "text/") === false)
 			{
 				$return .= $this->headerAlign("Content-Transfer-Encoding: base64").$this->linesep;
 				$return .= $this->headerAlign("Content-Disposition: ".$disposition.$disposition_fields).$this->linesep.$this->linesep;
@@ -284,7 +272,7 @@ Extend the class using old and new behavior
 	* @return string Multipart alternative footer
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function multipartBodyAlternativeFooter($id) { return "--=".$id.$this->data_boundary."--"; }
+	protected function multipartBodyAlternativeFooter($id) { return "--=".$id.$this->data_boundary."--"; }
 
 /**
 	* Returns a multipart body alternative header.
@@ -293,7 +281,7 @@ Extend the class using old and new behavior
 	* @return string Multipart alternative header
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function multipartBodyAlternativeHeader($id) { return "--".$this->data_boundary.$this->linesep.($this->headerAlign("Content-Type: multipart/alternative; boundary=\"=".$id.$this->data_boundary."\"")); }
+	protected function multipartBodyAlternativeHeader($id) { return "--".$this->data_boundary.$this->linesep.($this->headerAlign("Content-Type: multipart/alternative; boundary=\"=".$id.$this->data_boundary."\"")); }
 
 /**
 	* Returns a multipart body footer.
@@ -301,7 +289,7 @@ Extend the class using old and new behavior
 	* @return string Multipart footer
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function multipartFooter() { return "--".$this->data_boundary."--"; }
+	protected function multipartFooter() { return "--".$this->data_boundary."--"; }
 
 /**
 	* Adds the unique multipart header to the message.
@@ -310,7 +298,7 @@ Extend the class using old and new behavior
 	* @return string Multipart header declaration (including boundary)
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function multipartHeader($header_content_type = "multipart/related")
+	protected function multipartHeader($header_content_type = "multipart/related")
 	{
 		$this->data_boundary = uniqid("=_direct-mime_".$this->data_unique);
 		return $this->headerAlign("Content-Type: $header_content_type; boundary=\"".$this->data_boundary."\"");
@@ -324,7 +312,7 @@ Extend the class using old and new behavior
 	* @return string Formatted output string; empty on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function quotedPrintableEncode($data, $rfc2047 = false)
+	protected function quotedPrintableEncode($data, $rfc2047 = false)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->quotedPrintableEncode(+data, +rfc2047)- (#echo(__LINE__)#)"); }
 
@@ -535,7 +523,7 @@ Extend the class using old and new behavior
 	* @param object $event_handler EventHandler to use
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function setEventHandler($event_handler)
+	public function setEventHandler($event_handler)
 	{
 		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->setEventHandler(+event_handler)- (#echo(__LINE__)#)"); }
 		$this->event_handler = $event_handler;

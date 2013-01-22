@@ -66,57 +66,57 @@ class directHttp extends directBasics
 /**
 	* @var string $content_type Content type
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $content_type;
+	protected $content_type;
 /**
 	* @var string $curl_ptr CURL pointer
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $curl_ptr;
+	protected $curl_ptr;
 /**
 	* @var array $data Raw data received
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data = "";
+	protected $data = "";
 /**
 	* @var array $data_http_headers Cached headers of an HTTP call
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_http_headers = array();
+	protected $data_http_headers = array();
 /**
 	* @var string $data_http_result_code The result code of an HTTP call
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_http_result_code = "";
+	protected $data_http_result_code = "";
 /**
 	* @var int $implementation Implementation identifier
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $implementation;
+	protected $implementation;
 /**
 	* @var boolean $PHP_curl_init True if the PHP function "curl_init()" is
 	*      supported.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_curl_init;
+	protected $PHP_curl_init;
 /**
 	* @var boolean $PHP_fopen_url True if the PHP function "fopen()" accepts URLs.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_fopen_url;
+	protected $PHP_fopen_url;
 /**
 	* @var boolean $PHP_fsockopen True if the PHP function "fsockopen()" is
 	*      supported.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_fsockopen;
+	protected $PHP_fsockopen;
 /**
 	* @var boolean $PHP_stream_select True if the PHP function "stream_select()"
 	*      is supported.
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_stream_select;
+	protected $PHP_stream_select;
 /**
 	* @var string $timeout_connection Connection timeout
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $timeout_connection = 3;
+	protected $timeout_connection = 3;
 /**
 	* @var string $timeout_data Data timeout
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $timeout_data = 30;
+	protected $timeout_data = 30;
 
 /* -------------------------------------------------------------------------
-Extend the class using old and new behavior
+Extend the class
 ------------------------------------------------------------------------- */
 
 /**
@@ -125,7 +125,7 @@ Extend the class using old and new behavior
 	* @param object $event_handler EventHandler to use
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function __construct($event_handler = NULL)
+	public function __construct($event_handler = NULL)
 	{
 		parent::__construct($event_handler);
 
@@ -136,15 +136,6 @@ Extend the class using old and new behavior
 
 		$this->setImplementation();
 	}
-/*#ifdef(PHP4):
-/**
-	* Constructor (PHP4) directHttp
-	*
-	* @param object $event_handler EventHandler to use
-	* @since v0.1.00
-*\/
-	function directHttp($event_handler = NULL) { $this->__construct($event_handler); }
-:#*/
 /**
 	* Does an HTTP request using CURL.
 	*
@@ -160,7 +151,7 @@ Extend the class using old and new behavior
 	* @return mixed Remote content on success; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function curlRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
+	protected function curlRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->curlRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -273,7 +264,7 @@ Extend the class using old and new behavior
 	* @return mixed Returns the saved data
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function get()
+	public function get()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->get()- (#echo(__LINE__)#)"); }
 		return (isset($this->data) ? $this->data : false);
@@ -285,7 +276,7 @@ Extend the class using old and new behavior
 	* @return string HTTP content
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getContent()
+	public function getContent()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContent()- (#echo(__LINE__)#)"); }
 		return $this->get();
@@ -297,7 +288,7 @@ Extend the class using old and new behavior
 	* @return string HTTP content length value; false if undefined
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getContentSize()
+	public function getContentSize()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContentSize()- (#echo(__LINE__)#)"); }
 		$return = strlen($this->data);
@@ -317,7 +308,7 @@ Extend the class using old and new behavior
 	* @return string HTTP content type value; false if undefined
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getContentType()
+	public function getContentType()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContentType()- (#echo(__LINE__)#)"); }
 
@@ -333,7 +324,7 @@ Extend the class using old and new behavior
 	* @return array Found HTTP headers
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getHeaders()
+	public function getHeaders()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getHeaders()- (#echo(__LINE__)#)"); }
 		return $this->data_http_headers;
@@ -345,9 +336,9 @@ Extend the class using old and new behavior
 	* @return int Implementation identifier
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getImplementation()
+	public function getImplementation()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getImplementation()- (#echo(__LINE__)#)"); }
 		return $this->implementation;
 	}
 
@@ -358,7 +349,7 @@ Extend the class using old and new behavior
 	*         "error:403:Forbidden"
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getResultCode()
+	public function getResultCode()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getResultCode()- (#echo(__LINE__)#)"); }
 		return $this->data_http_result_code;
@@ -370,7 +361,7 @@ Extend the class using old and new behavior
 	* @return integer Time in seconds
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getTimeout()
+	public function getTimeout()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getTimeout()- (#echo(__LINE__)#)"); }
 		return $this->timeout_data;
@@ -382,7 +373,7 @@ Extend the class using old and new behavior
 	* @return integer Time in seconds
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function getTimeoutConnection()
+	public function getTimeoutConnection()
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getTimeoutConnection()- (#echo(__LINE__)#)"); }
 		return $this->timeout_connection;
@@ -397,7 +388,7 @@ Extend the class using old and new behavior
 	* @return string URL-encoded string of $data
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function queryParse($data, $form_data = false)
+	public function queryParse($data, $form_data = false)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->queryParse(+data, +form_data)- (#echo(__LINE__)#)"); }
 		$return = "";
@@ -481,7 +472,7 @@ The behaviour above might change for images in the future.
 	* @return mixed Remote content on success; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function request($request, $server, $port = 80, $path, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
+	public function request($request, $server, $port = 80, $path, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->request($request, $server, $port, $path, +query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -616,7 +607,7 @@ The behaviour above might change for images in the future.
 	* @return mixed Remote content on success; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function requestGet($server, $port = 80, $path = "", $query = "", $header_only = false)
+	public function requestGet($server, $port = 80, $path = "", $query = "", $header_only = false)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestGet($server, $port, $path, +query, +header_only)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -659,7 +650,7 @@ The behaviour above might change for images in the future.
 	* @return mixed Remote content on success; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function requestPost($server, $port = 80, $path = "", $data = "", $parse = true)
+	public function requestPost($server, $port = 80, $path = "", $data = "", $parse = true)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestPost($server, $port, $path, +data, +parse)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -716,7 +707,7 @@ The behaviour above might change for images in the future.
 	* @return mixed Remote content on success; false on error
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function requestRange($server, $port = 80, $path = "", $data = "", $byte_first = 0, $byte_last = "")
+	public function requestRange($server, $port = 80, $path = "", $data = "", $byte_first = 0, $byte_last = "")
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestRange($server, $port, $path, +data, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
@@ -755,7 +746,7 @@ The behaviour above might change for images in the future.
 	* @return string Content given by remote resource
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function responseParse($data, $headers_supported = true)
+	protected function responseParse($data, $headers_supported = true)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->responseParse(+data, +headers_supported)- (#echo(__LINE__)#)"); }
 
@@ -768,7 +759,7 @@ The behaviour above might change for images in the future.
 			$data_array[0] = $this->headerParse($data_array[0]);
 			if (is_array($data_array[0])) { $this->data_http_headers = array_merge($this->data_http_headers, $data_array[0]); }
 
-			if (isset($this->data_http_headers['transfer-encoding']) && /*#ifndef(PHP4) */stripos/* #*//*#ifdef(PHP4):stristr:#*/($this->data_http_headers['transfer-encoding'], "chunked") === 0)
+			if (isset($this->data_http_headers['transfer-encoding']) && stripos($this->data_http_headers['transfer-encoding'], "chunked") === 0)
 			{
 				$this->data = "";
 				$data = $data_array[1];
@@ -827,7 +818,7 @@ The behaviour above might change for images in the future.
 	* @param mixed $data Data to be saved
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function set($data)
+	public function set($data)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
 		$this->data = $data;
@@ -839,9 +830,9 @@ The behaviour above might change for images in the future.
 	* @param int $implementation Implementation identifier
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function setImplementation($implementation = NULL)
+	public function setImplementation($implementation = NULL)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setImplementation($implementation)- (#echo(__LINE__)#)"); }
 
 		if (!isset($implementation))
 		{
@@ -860,7 +851,7 @@ The behaviour above might change for images in the future.
 	* @param integer $timeout Time in seconds
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function setTimeout($timeout)
+	public function setTimeout($timeout)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setTimeout($timeout)- (#echo(__LINE__)#)"); }
 		$this->timeout_data = $timeout;
@@ -872,7 +863,7 @@ The behaviour above might change for images in the future.
 	* @param integer $timeout Time in seconds
 	* @since v0.1.00
 */
-	/*#ifndef(PHP4) */public /* #*/function setTimeoutConnection($timeout)
+	public function setTimeoutConnection($timeout)
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setTimeoutConnection($timeout)- (#echo(__LINE__)#)"); }
 		$this->timeout_connection = $timeout;
@@ -893,7 +884,7 @@ The behaviour above might change for images in the future.
 	* @param  mixed $byte_last Last byte to be read (empty for EOF)
 	* @since  v0.1.00
 */
-	/*#ifndef(PHP4) */protected /* #*/function socketRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
+	protected function socketRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
 		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->socketRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
