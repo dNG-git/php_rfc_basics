@@ -832,7 +832,7 @@ The behaviour above might change for images in the future.
 */
 	public function setImplementation($implementation = NULL)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setImplementation($implementation)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setImplementation(+implementation)- (#echo(__LINE__)#)"); }
 
 		if (!isset($implementation))
 		{
