@@ -59,14 +59,18 @@ all development packets)
 */
 class directHttp extends directBasics
 {
+	const CURL = 1;
+	const FILE_HANDLE = 2;
+	const SOCKET = 3;
+
 /**
 	* @var string $content_type Content type
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $content_type = NULL;
+	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $content_type;
 /**
 	* @var string $curl_ptr CURL pointer
 */
-	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $curl_ptr = NULL;
+	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $curl_ptr;
 /**
 	* @var array $data Raw data received
 */
@@ -80,12 +84,25 @@ class directHttp extends directBasics
 */
 	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $data_http_result_code = "";
 /**
+	* @var int $implementation Implementation identifier
+*/
+	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $implementation;
+/**
 	* @var boolean $PHP_curl_init True if the PHP function "curl_init()" is
 	*      supported.
 */
 	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_curl_init;
 /**
-	* @var boolean $PHP_stream_select True if the PHP function "stream_select() "
+	* @var boolean $PHP_fopen_url True if the PHP function "fopen()" accepts URLs.
+*/
+	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_fopen_url;
+/**
+	* @var boolean $PHP_fsockopen True if the PHP function "fsockopen()" is
+	*      supported.
+*/
+	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_fsockopen;
+/**
+	* @var boolean $PHP_stream_select True if the PHP function "stream_select()"
 	*      is supported.
 */
 	/*#ifndef(PHP4) */protected/* #*//*#ifdef(PHP4):var:#*/ $PHP_stream_select;
@@ -112,9 +129,12 @@ Extend the class using old and new behavior
 	{
 		parent::__construct($event_handler);
 
-		if (!defined("USE_socket")) { define("USE_socket", function_exists("fsockopen")); }
-		$this->PHP_curl_init = (defined("USE_curl") ? USE_curl : function_exists("curl_init"));
+		$this->PHP_curl_init = function_exists("curl_init");
+		$this->PHP_fopen_url = @get_cfg_var("allow_url_fopen");
+		$this->PHP_fsockopen = function_exists("fsockopen");
 		$this->PHP_stream_select = function_exists("stream_select");
+
+		$this->setImplementation();
 	}
 /*#ifdef(PHP4):
 /**
@@ -142,7 +162,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */protected /* #*/function curlRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->curlRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->curlRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		if (is_int($byte_first)) { $range = (is_int($byte_last) ? $byte_first."-".$byte_last : $byte_first."-"); }
@@ -212,7 +232,7 @@ Extend the class using old and new behavior
 					$this->data = "";
 					$this->data_http_headers = array();
 					$this->data_http_result_code = "error::".$error;
-					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->curlRequest()- received error: ".$error); }
+					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->curlRequest()- received error: ".$error); }
 				}
 				else { $return = $this->responseParse($response); }
 			}
@@ -221,7 +241,7 @@ Extend the class using old and new behavior
 				$this->data = "";
 				$this->data_http_headers = array();
 				$this->data_http_result_code = "error::invalid request";
-				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->curlRequest()- got an invalid request"); }
+				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->curlRequest()- got an invalid request"); }
 			}
 		}
 		else
@@ -229,7 +249,7 @@ Extend the class using old and new behavior
 			$this->data = "";
 			$this->data_http_headers = array();
 			$this->data_http_result_code = "error::invalid request";
-			if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->curlRequest()- got an invalid request"); }
+			if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->curlRequest()- got an invalid request"); }
 		}
 
 		return $return;
@@ -243,7 +263,7 @@ Extend the class using old and new behavior
 */
 	public function defineContentType($type = NULL)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->defineContentType(+type)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->defineContentType(+type)- (#echo(__LINE__)#)"); }
 		$this->content_type = $type;
 	}
 
@@ -255,7 +275,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function get()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->get()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->get()- (#echo(__LINE__)#)"); }
 		return (isset($this->data) ? $this->data : false);
 	}
 
@@ -267,7 +287,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function getContent()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getContent()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContent()- (#echo(__LINE__)#)"); }
 		return $this->get();
 	}
 
@@ -279,7 +299,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function getContentSize()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getContentSize()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContentSize()- (#echo(__LINE__)#)"); }
 		$return = strlen($this->data);
 
 		if (!$return)
@@ -299,7 +319,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function getContentType()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getContentType()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getContentType()- (#echo(__LINE__)#)"); }
 
 		if ($this->data_http_headers && isset($this->data_http_headers['content-type'])) { $return = trim(preg_replace("#^(.+?);(.*?)$#s", "\\1", $this->data_http_headers['content-type'])); }
 		else { $return = false; }
@@ -315,8 +335,20 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function getHeaders()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getHeaders()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getHeaders()- (#echo(__LINE__)#)"); }
 		return $this->data_http_headers;
+	}
+
+/**
+	* Returns the request implementation in use.
+	*
+	* @return int Implementation identifier
+	* @since  v0.1.00
+*/
+	/*#ifndef(PHP4) */public /* #*/function getImplementation()
+	{
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
+		return $this->implementation;
 	}
 
 /**
@@ -328,7 +360,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function getResultCode()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getResultCode()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getResultCode()- (#echo(__LINE__)#)"); }
 		return $this->data_http_result_code;
 	}
 
@@ -336,11 +368,11 @@ Extend the class using old and new behavior
 	* Returns the maximum time the process is waiting for all data to arrive.
 	*
 	* @return integer Time in seconds
-	* @since  v0.1.03
+	* @since  v0.1.00
 */
 	/*#ifndef(PHP4) */public /* #*/function getTimeout()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getTimeout()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getTimeout()- (#echo(__LINE__)#)"); }
 		return $this->timeout_data;
 	}
 
@@ -348,11 +380,11 @@ Extend the class using old and new behavior
 	* Returns the maximum time to wait for establishing a connection.
 	*
 	* @return integer Time in seconds
-	* @since  v0.1.03
+	* @since  v0.1.00
 */
 	/*#ifndef(PHP4) */public /* #*/function getTimeoutConnection()
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->getTimeoutConnection()- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->getTimeoutConnection()- (#echo(__LINE__)#)"); }
 		return $this->timeout_connection;
 	}
 
@@ -367,7 +399,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function queryParse($data, $form_data = false)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->queryParse(+data, +form_data)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->queryParse(+data, +form_data)- (#echo(__LINE__)#)"); }
 		$return = "";
 
 		if (is_string($data))
@@ -451,7 +483,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */public /* #*/function request($request, $server, $port = 80, $path, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->request($request, $server, $port, $path, +query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->request($request, $server, $port, $path, +query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		if ($query) { $query = "?".$query; }
@@ -465,20 +497,25 @@ The behaviour above might change for images in the future.
 				elseif ($this->event_handler !== NULL)
 				{
 					$byte_last = "";
-					$this->event_handler->warn("#echo(__FILEPATH__)# -webFunctions->request()- ignored an invalid HTTP range");
+					$this->event_handler->warn("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
 				}
 			}
 			elseif ($byte_first >= 0 && empty($byte_last)) { $range = $byte_first."-"; }
 			elseif ($this->event_handler !== NULL)
 			{
 				$byte_first = "";
-				$this->event_handler->warn("#echo(__FILEPATH__)# -webFunctions->request()- ignored an invalid HTTP range");
+				$this->event_handler->warn("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
 			}
 		}
 
-		if ($this->PHP_curl_init) { $return = $this->curlRequest($request, $server, $port, $path.$query, $data, $header_only, $byte_first, $byte_last); }
-		elseif (USE_socket) { $return = $this->socketRequest($request, $server, $port, $path.$query, $data, $header_only, $byte_first, $byte_last); }
-		elseif (@get_cfg_var("allow_url_fopen"))
+		switch ($this->implementation)
+		{
+		case self::CURL:
+		{
+			$return = $this->curlRequest($request, $server, $port, $path.$query, $data, $header_only, $byte_first, $byte_last);
+			break 1;
+		}
+		case self::FILE_HANDLE:
 		{
 			if (preg_match("#^http(s|):\/\/#i", $server))
 			{
@@ -510,7 +547,7 @@ The behaviour above might change for images in the future.
 							$this->data = "";
 							$this->data_http_headers = array();
 							$this->data_http_result_code = "error::timeout";
-							if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->request()- timed out"); }
+							if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->request()- timed out"); }
 						}
 					}
 					else
@@ -531,7 +568,7 @@ The behaviour above might change for images in the future.
 							$this->data = "";
 							$this->data_http_headers = array();
 							$this->data_http_result_code = "error::timeout";
-							if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->request()- timed out"); }
+							if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->request()- timed out"); }
 						}
 					}
 
@@ -542,7 +579,7 @@ The behaviour above might change for images in the future.
 					$this->data = "";
 					$this->data_http_headers = array();
 					$this->data_http_result_code = "error::no response";
-					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->request()- received no response"); }
+					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->request()- received no response"); }
 				}
 			}
 			else
@@ -550,10 +587,18 @@ The behaviour above might change for images in the future.
 				$this->data = "";
 				$this->data_http_headers = array();
 				$this->data_http_result_code = "error::invalid request";
-				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->request()- got an invalid request"); }
+				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->request()- got an invalid request"); }
 			}
+
+			break 1;
 		}
-		elseif ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->request()- has no possibility for opening remote content"); }
+		case self::SOCKET:
+		{
+			$return = $this->socketRequest($request, $server, $port, $path.$query, $data, $header_only, $byte_first, $byte_last);
+			break 1;
+		}
+		default: { $this->event_handler->error("#echo(__FILEPATH__)# -http->request()- has no possibility for opening remote content"); }
+		}
 
 		return $return;
 	}
@@ -573,7 +618,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */public /* #*/function requestGet($server, $port = 80, $path = "", $query = "", $header_only = false)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->requestGet($server, $port, $path, +query, +header_only)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestGet($server, $port, $path, +query, +header_only)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		$query = $this->queryParse($query);
@@ -583,9 +628,20 @@ The behaviour above might change for images in the future.
 		$this->data_http_headers = array();
 		$this->data_http_result_code = "";
 
-		if ($this->PHP_curl_init) { $return = $this->curlRequest("GET", $server, $port, $path.$query, NULL, $header_only); }
-		elseif (USE_socket) { $return = $this->socketRequest("GET", $server, $port, $path.$query, NULL, $header_only); }
-		else { $return = $this->request("GET", $server, $port, $path.$query, NULL, $header_only); }
+		switch ($this->implementation)
+		{
+		case self::CURL:
+		{
+			$return = $this->curlRequest("GET", $server, $port, $path.$query, NULL, $header_only);
+			break 1;
+		}
+		case self::SOCKET:
+		{
+			$return = $this->socketRequest("GET", $server, $port, $path.$query, NULL, $header_only);
+			break 1;
+		}
+		default: { $return = $this->request("GET", $server, $port, $path.$query, NULL, $header_only); }
+		}
 
 		return $return;
 	}
@@ -605,7 +661,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */public /* #*/function requestPost($server, $port = 80, $path = "", $data = "", $parse = true)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->requestPost($server, $port, $path, +data, +parse)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestPost($server, $port, $path, +data, +parse)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		$reset_content_type = true;
@@ -626,9 +682,20 @@ The behaviour above might change for images in the future.
 			$data .= "\r\n".$this->multipartFooter();
 		}
 
-		if ($this->PHP_curl_init) { $return = $this->curlRequest("POST", $server, $port, $path, $data); }
-		elseif (USE_socket) { $return = $this->socketRequest("POST", $server, $port, $path, $data); }
-		else { $return = $this->request("POST", $server, $port, $path, $data); }
+		switch ($this->implementation)
+		{
+		case self::CURL:
+		{
+			$return = $this->curlRequest("POST", $server, $port, $path, $data);
+			break 1;
+		}
+		case self::SOCKET:
+		{
+			$return = $this->socketRequest("POST", $server, $port, $path, $data);
+			break 1;
+		}
+		default: { $return = $this->request("POST", $server, $port, $path, $data); }
+		}
 
 		if ($reset_content_type) { $this->defineContentType(NULL); }
 
@@ -651,7 +718,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */public /* #*/function requestRange($server, $port = 80, $path = "", $data = "", $byte_first = 0, $byte_last = "")
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->requestRange($server, $port, $path, +data, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->requestRange($server, $port, $path, +data, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		$query = $this->queryParse($data);
@@ -661,9 +728,20 @@ The behaviour above might change for images in the future.
 		$this->data_http_headers = array();
 		$this->data_http_result_code = "";
 
-		if ($this->PHP_curl_init) { $return = $this->curlRequest("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last); }
-		elseif (USE_socket) { $return = $this->socketRequest("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last); }
-		else { $return = $this->request("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last); }
+		switch ($this->implementation)
+		{
+		case self::CURL:
+		{
+			$return = $this->curlRequest("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last);
+			break 1;
+		}
+		case self::SOCKET:
+		{
+			$return = $this->socketRequest("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last);
+			break 1;
+		}
+		default: { $return = $this->request("GET", $server, $port, $path.$query, $data, false, $byte_first, $byte_last); }
+		}
 
 		return $return;
 	}
@@ -679,7 +757,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */protected /* #*/function responseParse($data, $headers_supported = true)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->responseParse(+data, +headers_supported)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->responseParse(+data, +headers_supported)- (#echo(__LINE__)#)"); }
 
 		if ($headers_supported)
 		{
@@ -747,23 +825,44 @@ The behaviour above might change for images in the future.
 	* This operation fills $this->data with $data.
 	*
 	* @param mixed $data Data to be saved
-	* @since v0.1.03
+	* @since v0.1.00
 */
 	/*#ifndef(PHP4) */public /* #*/function set($data)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->set(+data)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
 		$this->data = $data;
+	}
+
+/**
+	* Set the request implementation to use.
+	*
+	* @param int $implementation Implementation identifier
+	* @since v0.1.00
+*/
+	/*#ifndef(PHP4) */public /* #*/function setImplementation($implementation = NULL)
+	{
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->set(+data)- (#echo(__LINE__)#)"); }
+
+		if (!isset($implementation))
+		{
+			if ($this->PHP_curl_init) { $implementation = self::CURL; }
+			else { $implementation = ($this->PHP_fsockopen ? self::SOCKET : self::FILE_HANDLE); }
+		}
+
+		if ($implementation == self::CURL && $this->PHP_curl_init) { $this->implementation = self::CURL; }
+		elseif ($implementation == self::SOCKET && $this->PHP_fsockopen) { $this->implementation = self::SOCKET; }
+		elseif ($this->PHP_fopen_url) { $this->implementation = self::FILE_HANDLE; }
 	}
 
 /**
 	* Sets the maximum time the process is waiting for all data to arrive.
 	*
 	* @param integer $timeout Time in seconds
-	* @since v0.1.03
+	* @since v0.1.00
 */
 	/*#ifndef(PHP4) */public /* #*/function setTimeout($timeout)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->setTimeout($timeout)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setTimeout($timeout)- (#echo(__LINE__)#)"); }
 		$this->timeout_data = $timeout;
 	}
 
@@ -771,11 +870,11 @@ The behaviour above might change for images in the future.
 	* Defines the maximum time to wait for establishing a connection.
 	*
 	* @param integer $timeout Time in seconds
-	* @since v0.1.03
+	* @since v0.1.00
 */
 	/*#ifndef(PHP4) */public /* #*/function setTimeoutConnection($timeout)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->setTimeoutConnection($timeout)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->setTimeoutConnection($timeout)- (#echo(__LINE__)#)"); }
 		$this->timeout_connection = $timeout;
 	}
 
@@ -796,7 +895,7 @@ The behaviour above might change for images in the future.
 */
 	/*#ifndef(PHP4) */protected /* #*/function socketRequest($request, $server, $port = 80, $query = "", $data = NULL, $header_only = false, $byte_first = "", $byte_last = "")
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -webFunctions->socketRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -http->socketRequest($request, $server, $port, $query, +data, +header_only, $byte_first, $byte_last)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		if (is_int($byte_first)) { $range = (is_int($byte_last) ? $byte_first."-".$byte_last : $byte_first."-"); }
@@ -813,7 +912,7 @@ The behaviour above might change for images in the future.
 				$this->data = "";
 				$this->data_http_headers = array();
 				$this->data_http_result_code = "error:$error_code:".$error;
-				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->socketRequest()- received error: $error ($error_code)"); }
+				if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->socketRequest()- received error: $error ($error_code)"); }
 			}
 			elseif ($stream_ptr)
 			{
@@ -846,7 +945,7 @@ The behaviour above might change for images in the future.
 						$this->data = "";
 						$this->data_http_headers = array();
 						$this->data_http_result_code = "error::timeout";
-						if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->socketRequest()- timed out"); }
+						if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->socketRequest()- timed out"); }
 					}
 				}
 				else
@@ -854,7 +953,7 @@ The behaviour above might change for images in the future.
 					$this->data = "";
 					$this->data_http_headers = array();
 					$this->data_http_result_code = "error::no response";
-					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->socketRequest()- received no response"); }
+					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->socketRequest()- received no response"); }
 				}
 
 				fclose($stream_ptr);
@@ -865,7 +964,7 @@ The behaviour above might change for images in the future.
 			$this->data = "";
 			$this->data_http_headers = array();
 			$this->data_http_result_code = "error::invalid request";
-			if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -webFunctions->socketRequest()- got an invalid request"); }
+			if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->socketRequest()- got an invalid request"); }
 		}
 
 		return $return;

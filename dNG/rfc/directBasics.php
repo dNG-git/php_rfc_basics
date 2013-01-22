@@ -103,7 +103,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function __construct($event_handler = NULL)
 	{
-		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->__construct(directBasics)- (#echo(__LINE__)#)"); }
+		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->__construct(directBasics)- (#echo(__LINE__)#)"); }
 
 		$this->data_unique = uniqid();
 		$this->event_handler = $event_handler;
@@ -139,7 +139,7 @@ Extend the class using old and new behavior
 */
 	public function defineEncoding($encoding)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->defineEncoding($encoding)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->defineEncoding($encoding)- (#echo(__LINE__)#)"); }
 		$this->data_encoding = $encoding;
 	}
 
@@ -152,7 +152,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */protected /* #*/function headerAlign($header)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->headerAlign(+header)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->headerAlign(+header)- (#echo(__LINE__)#)"); }
 
 		if (strlen($header) > 76)
 		{
@@ -192,7 +192,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function headerParse($headers)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->headerParse(+headers)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->headerParse(+headers)- (#echo(__LINE__)#)"); }
 		$return = false;
 
 		if (is_string($headers) && strlen($headers))
@@ -225,7 +225,7 @@ Extend the class using old and new behavior
 				}
 			}
 		}
-		elseif ($this->event_handler !== NULL) { $this->event_handler->warn("#echo(__FILEPATH__)# -basicRfcFunctions->headerParse()- got invalid input to parse"); }
+		elseif ($this->event_handler !== NULL) { $this->event_handler->warn("#echo(__FILEPATH__)# -rfcBasics->headerParse()- got invalid input to parse"); }
 
 		return $return;
 	}
@@ -241,7 +241,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */protected /* #*/function multipartBody($name, $data, $alternative_id = "")
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->multipartBody($name, +data, $alternative_id)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->multipartBody($name, +data, $alternative_id)- (#echo(__LINE__)#)"); }
 		$return = (strlen($alternative_id) ? "--=".$alternative_id : "--").$this->data_boundary.$this->linesep;
 
 		if (strpos($name, "@") === false)
@@ -326,7 +326,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */protected /* #*/function quotedPrintableEncode($data, $rfc2047 = false)
 	{
-		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->quotedPrintableEncode(+data, +rfc2047)- (#echo(__LINE__)#)"); }
+		if ($this->event_handler !== NULL) { $this->event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->quotedPrintableEncode(+data, +rfc2047)- (#echo(__LINE__)#)"); }
 
 		$has_cr = false;
 		$has_lf = true;
@@ -537,7 +537,7 @@ Extend the class using old and new behavior
 */
 	/*#ifndef(PHP4) */public /* #*/function setEventHandler($event_handler)
 	{
-		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -basicRfcFunctions->setEventHandler(+event_handler)- (#echo(__LINE__)#)"); }
+		if ($event_handler !== NULL) { $event_handler->debug("#echo(__FILEPATH__)# -rfcBasics->setEventHandler(+event_handler)- (#echo(__LINE__)#)"); }
 		$this->event_handler = $event_handler;
 	}
 }
