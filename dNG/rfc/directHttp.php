@@ -136,6 +136,7 @@ Extend the class
 
 		$this->setImplementation();
 	}
+
 /**
 	* Does an HTTP request using CURL.
 	*
@@ -211,6 +212,7 @@ Extend the class
 
 				$response = curl_exec($this->curl_ptr);
 				$error = curl_error($this->curl_ptr);
+				$error_code = curl_errno($this->curl_ptr);
 
 				if ($curl_close)
 				{
@@ -218,12 +220,12 @@ Extend the class
 					$this->curl_ptr = NULL;
 				}
 
-				if (strlen($error))
+				if ($error_code || strlen($error))
 				{
 					$this->data = "";
 					$this->data_http_headers = array();
-					$this->data_http_result_code = "error::".$error;
-					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->curlRequest()- received error: ".$error); }
+					$this->data_http_result_code = "error:$error_code:".$error;
+					if ($this->event_handler !== NULL) { $this->event_handler->error("#echo(__FILEPATH__)# -http->curlRequest()- received error: $error ($error_code)"); }
 				}
 				else { $return = $this->responseParse($response); }
 			}
@@ -898,7 +900,7 @@ The behaviour above might change for images in the future.
 			$error_code = 0;
 			$stream_ptr = @fsockopen($result_array[2], $port, $error_code, $error, $this->timeout_connection);
 
-			if ($error_code || $error)
+			if ($error_code || strlen($error))
 			{
 				$this->data = "";
 				$this->data_http_headers = array();
