@@ -213,7 +213,7 @@ Construct the class
 				}
 			}
 		}
-		elseif ($this->event_handler !== NULL) { $this->event_handler->warn("#echo(__FILEPATH__)# -rfcBasics->headerParse()- got invalid input to parse"); }
+		elseif ($this->event_handler !== NULL) { $this->event_handler->warning("#echo(__FILEPATH__)# -rfcBasics->headerParse()- got invalid input to parse"); }
 
 		return $return;
 	}

@@ -488,14 +488,14 @@ The behaviour above might change for images in the future.
 				elseif ($this->event_handler !== NULL)
 				{
 					$byte_last = "";
-					$this->event_handler->warn("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
+					$this->event_handler->warning("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
 				}
 			}
 			elseif ($byte_first >= 0 && empty($byte_last)) { $range = $byte_first."-"; }
 			elseif ($this->event_handler !== NULL)
 			{
 				$byte_first = "";
-				$this->event_handler->warn("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
+				$this->event_handler->warning("#echo(__FILEPATH__)# -http->request()- ignored an invalid HTTP range");
 			}
 		}
 
@@ -523,7 +523,7 @@ The behaviour above might change for images in the future.
 				}
 
 				$file_context = array("http" => $file_context);
-				$file_ptr = fopen($server.":".$port.$path.$query, "r", $file_context);
+				$file_ptr = @fopen($server.":".$port.$path.$query, "r", $file_context);
 
 				if ($file_ptr)
 				{
